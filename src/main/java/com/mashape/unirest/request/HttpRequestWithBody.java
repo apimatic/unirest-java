@@ -26,7 +26,9 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 package com.mashape.unirest.request;
 
 import java.io.File;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -94,6 +96,21 @@ public class HttpRequestWithBody extends HttpRequest {
 		MultipartBody body =  new MultipartBody(this);
 		if (parameters != null) {
 			for(Entry<String, Object> param : parameters.entrySet()) {
+				if (param.getValue() instanceof File) {
+					body.field(param.getKey(), (File)param.getValue());
+				} else {
+					body.field(param.getKey(), (param.getValue() == null) ? "" : param.getValue().toString());
+				}
+			}
+		}
+		this.body = body;
+		return body;
+	}
+
+	public MultipartBody fields(List<SimpleEntry<String, Object>> parameters) {
+		MultipartBody body =  new MultipartBody(this);
+		if (parameters != null) {
+			for(SimpleEntry<String, Object> param : parameters) {
 				if (param.getValue() instanceof File) {
 					body.field(param.getKey(), (File)param.getValue());
 				} else {
